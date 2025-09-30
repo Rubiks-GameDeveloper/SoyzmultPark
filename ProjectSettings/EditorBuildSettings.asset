@@ -14,5 +14,8 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/WebAR Foundation/Samples/ImageTrackingCustom.unity
     guid: d35f9b4190b0143398969787f104e7b9
+  - enabled: 0
+    path: Assets/WebAR Foundation/Samples/FaceTrackingCustom.unity
+    guid: 1fa5c84c3c9a84628b0a96be74b1eae7
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
