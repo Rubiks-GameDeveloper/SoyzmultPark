@@ -18,13 +18,14 @@ public class ARController : MonoBehaviour
 
     void OnTargetFound(int targetIndex)
     {
+        print("Target found: " + targetIndex);
         // targetIndex — индекс в .mind (0 для Чебурашки, 1 для Волка)
-        if (targetIndex == 0)
+        if (targetIndex is 0 or 1)
         {
             cheburashkaObject.SetActive(true); // Показать анимированный/статичный объект
             // Запустить анимацию: cheburashkaObject.GetComponent<Animator>().Play("AnimationName");
         }
-        else if (targetIndex == 1)
+        else if (targetIndex is 2 or 3)
         {
             wolfObject.SetActive(true);
         }
