@@ -62,8 +62,7 @@ public class GalleryManager : MonoBehaviour
         downloadButton.onClick.RemoveAllListeners();
         downloadButton.onClick.AddListener(() =>
         {
-            captureScript.DownloadPhoto(selectedPhoto);
-            fullViewPanel.SetActive(false);
+            //captureScript.DownloadPhoto(selectedPhoto);
             ShowBanner();
         });
 
@@ -79,6 +78,7 @@ public class GalleryManager : MonoBehaviour
         // Проверяем, первая ли это загрузка в сессии
         if (firstDownload)
         {
+            print(1);
             bannerPanel.SetActive(true);
 
             // Кнопка "Купить билеты"
