@@ -1,9 +1,9 @@
-const cacheName = "DefaultCompany-SoyzmultPark-0.1.0";
+const cacheName = "DefaultCompany-SoyzmultPark-0.0.1";
 const contentToCache = [
     "Build/docs.loader.js",
-    "Build/docs.framework.js.br",
-    "Build/docs.data.br",
-    "Build/docs.wasm.br",
+    "Build/docs.framework.js.unityweb",
+    "Build/docs.data.unityweb",
+    "Build/docs.wasm.unityweb",
     "TemplateData/style.css"
 
 ];
