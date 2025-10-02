@@ -20,19 +20,17 @@ public class ARController : MonoBehaviour
     [SerializeField] private float dissolveDuration = 0.5f;
     [SerializeField] private float transparentUIDuration = 0.5f;
 
-    private Renderer _genaObjectRenderer;
-    private Renderer _shopoklyakObjectRenderer;
+    [SerializeField] private List<Renderer> rendersToDissolve;
     [SerializeField] private ParticleSystem _snowfallParticleSystem;
 
     private MindARImageTrackingManager imageTracker;
 
     private void Start()
     {
-        _genaObjectRenderer = genaObject.GetComponentInChildren<Renderer>();
-        _shopoklyakObjectRenderer = shopoklyakObject.GetComponent<Renderer>();
-        
-        _genaObjectRenderer.sharedMaterial.SetFloat(Amount, 1);
-        _shopoklyakObjectRenderer.sharedMaterial.SetFloat(Amount, 1);
+        foreach (var render in rendersToDissolve)
+        {
+            render.sharedMaterial.SetFloat(Amount, 1);
+        }
         
         imageTracker = GetComponent<MindARImageTrackingManager>();
         imageTracker.onTargetFoundEvent += OnTargetFound;
@@ -60,16 +58,17 @@ public class ARController : MonoBehaviour
         print("Target found: " + targetIndex);
         if (targetIndex is 0 or 1)
         {
-            genaObject.SetActive(true);
             
             Tween.StopAll(onTarget: transparentSampleCouple);
             Tween.Alpha(transparentSampleCouple, 0, transparentSampleDuration);
-            
-            Tween.StopAll(onTarget: _genaObjectRenderer.sharedMaterial);
-            Tween.MaterialProperty(_genaObjectRenderer.sharedMaterial, Amount, 0, dissolveDuration);
-            
-            Tween.StopAll(onTarget: _shopoklyakObjectRenderer.sharedMaterial);
-            Tween.MaterialProperty(_shopoklyakObjectRenderer.sharedMaterial, Amount, 0, dissolveDuration);
+
+            foreach (var renderer in rendersToDissolve)
+            {
+                Tween.CompleteAll(onTarget: renderer.sharedMaterial);
+                Tween.MaterialProperty(renderer.sharedMaterial, Amount, 0, dissolveDuration);
+                
+                renderer.gameObject.SetActive(true);
+            }
             
             _snowfallParticleSystem.Play();
         }
@@ -84,11 +83,12 @@ public class ARController : MonoBehaviour
         Tween.StopAll(onTarget: transparentSampleCouple);
         Tween.Alpha(transparentSampleCouple, 0.5f, transparentSampleDuration);
         
-        Tween.StopAll(onTarget: _genaObjectRenderer.sharedMaterial);
-        Tween.MaterialProperty(_genaObjectRenderer.sharedMaterial, Amount, 1, dissolveDuration).OnComplete(() => genaObject.SetActive(false));
+        foreach (var renderer in rendersToDissolve)
+        {
+            Tween.CompleteAll(onTarget: renderer.sharedMaterial);
+            Tween.MaterialProperty(renderer.sharedMaterial, Amount, 1, dissolveDuration).OnComplete(() => renderer.gameObject.SetActive(false));
+        }
         
-        Tween.StopAll(onTarget: _shopoklyakObjectRenderer.sharedMaterial);
-        Tween.MaterialProperty(_shopoklyakObjectRenderer.sharedMaterial, Amount, 1, dissolveDuration).OnComplete(() => shopoklyakObject.SetActive(false));
         _snowfallParticleSystem.Stop();
     }
 }
