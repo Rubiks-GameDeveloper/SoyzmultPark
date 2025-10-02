@@ -62,7 +62,7 @@ public class GalleryManager : MonoBehaviour
         downloadButton.onClick.RemoveAllListeners();
         downloadButton.onClick.AddListener(() =>
         {
-            //captureScript.DownloadPhoto(selectedPhoto);
+            captureScript.DownloadPhoto(selectedPhoto);
             ShowBanner();
         });
 
