@@ -5,6 +5,7 @@ using System.Linq;
 using AOT;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 namespace WebARFoundation
 {
@@ -40,8 +41,9 @@ public class MindARImageTrackingManager : MonoBehaviour
         private bool[] isTargetVisibles;
 
         public Action OnARActivated;
+        public Action OnARStarted;
 
-        void Awake()
+        private void Awake()
         {   
             Debug.Log("mind file url: " + mindFileURL);
 
@@ -58,8 +60,8 @@ public class MindARImageTrackingManager : MonoBehaviour
                      .GetComponentsInChildren<ImageTracker>())
                  .ToList();
 
-            int maxTargetIndex = 0;
-            foreach(ImageTracker imageTracker in imageTrackers) {
+            var maxTargetIndex = 0;
+            foreach(var imageTracker in imageTrackers) {
                 maxTargetIndex = Math.Max(maxTargetIndex, imageTracker.targetIndex);
                 imageTracker.gameObject.SetActive(false);
             }
@@ -97,6 +99,8 @@ public class MindARImageTrackingManager : MonoBehaviour
             MindARImagePlugin.SetFilterBeta(filterBeta);
 
             MindARImagePlugin.StartAR();
+            
+            OnARStarted?.Invoke();
         }
         private void OnARReady()
         {

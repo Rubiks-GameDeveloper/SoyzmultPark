@@ -1,40 +1,78 @@
+using System.Collections.Generic;
+using PrimeTween;
 using UnityEngine;
-using WebARFoundation; // Импорт из плагина
+using UnityEngine.Serialization;
+using UnityEngine.UI;
+using WebARFoundation;
 
 public class ARController : MonoBehaviour
 {
-    public GameObject cheburashkaObject; // 3D-объект для Чебурашки
-    public GameObject wolfObject; // 3D-объект для Волка
-    // Добавьте для других
+    private static readonly int Amount = Shader.PropertyToID("_Amount");
+    [SerializeField] private GameObject genaObject;
+
+    [SerializeField] private RawImage transparentSampleCouple;
+    [SerializeField] private float transparentSampleDuration = 0.2f;
+    
+    [SerializeField] private List<Graphic> imageList = new();
+    
+    [SerializeField] private float dissolveDuration = 0.5f;
+    [SerializeField] private float transparentUIDuration = 0.5f;
+
+    private Renderer _genaObjectRenderer;
+    private ParticleSystem _genaObjectParticleSystem;
 
     private MindARImageTrackingManager imageTracker;
 
-    void Start()
+    private void Start()
     {
+        _genaObjectRenderer = genaObject.GetComponent<Renderer>();
+        _genaObjectParticleSystem = genaObject.GetComponentInChildren<ParticleSystem>();
+        
+        _genaObjectRenderer.sharedMaterial.SetFloat(Amount, 1);
+        
         imageTracker = GetComponent<MindARImageTrackingManager>();
         imageTracker.onTargetFoundEvent += OnTargetFound;
         imageTracker.onTargetLostEvent += OnTargetLost;
-    }
 
-    void OnTargetFound(int targetIndex)
+        imageTracker.OnARStarted += () =>
+        {
+            foreach (var image in imageList)
+            {
+                Tween.Alpha(image, 0, transparentUIDuration).
+                    OnComplete(() => Tween.Alpha(transparentSampleCouple, 0.5f, transparentSampleDuration));
+            }
+        };
+    }
+    
+    
+
+    private void OnTargetFound(int targetIndex)
     {
         print("Target found: " + targetIndex);
-        // targetIndex — индекс в .mind (0 для Чебурашки, 1 для Волка)
         if (targetIndex is 0 or 1)
         {
-            cheburashkaObject.SetActive(true); // Показать анимированный/статичный объект
-            // Запустить анимацию: cheburashkaObject.GetComponent<Animator>().Play("AnimationName");
+            genaObject.SetActive(true);
+            
+            Tween.StopAll(onTarget: transparentSampleCouple);
+            Tween.Alpha(transparentSampleCouple, 0, transparentSampleDuration);
+            
+            Tween.StopAll(onTarget: _genaObjectRenderer.sharedMaterial);
+            Tween.MaterialProperty(_genaObjectRenderer.sharedMaterial, Amount, 0, dissolveDuration);
+            _genaObjectParticleSystem.Play();
         }
         else if (targetIndex is 2 or 3)
         {
-            wolfObject.SetActive(true);
+            //wolfObject.SetActive(true);
         }
     }
 
-    void OnTargetLost(int targetIndex)
+    private void OnTargetLost(int targetIndex)
     {
-        // Скрыть объекты
-        cheburashkaObject.SetActive(false);
-        wolfObject.SetActive(false);
+        Tween.StopAll(onTarget: transparentSampleCouple);
+        Tween.Alpha(transparentSampleCouple, 0.5f, transparentSampleDuration);
+        
+        Tween.StopAll(onTarget: _genaObjectRenderer.sharedMaterial);
+        Tween.MaterialProperty(_genaObjectRenderer.sharedMaterial, Amount, 1, dissolveDuration).OnComplete(() => genaObject.SetActive(false));
+        _genaObjectParticleSystem.Stop();
     }
 }
