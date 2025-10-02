@@ -26,7 +26,7 @@ public class ARController : MonoBehaviour
 
     private void Start()
     {
-        _genaObjectRenderer = genaObject.GetComponent<Renderer>();
+        _genaObjectRenderer = genaObject.GetComponentInChildren<Renderer>();
         _genaObjectParticleSystem = genaObject.GetComponentInChildren<ParticleSystem>();
         
         _genaObjectRenderer.sharedMaterial.SetFloat(Amount, 1);
