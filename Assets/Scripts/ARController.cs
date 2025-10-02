@@ -29,9 +29,10 @@ public class ARController : MonoBehaviour
     private void Start()
     {
         _genaObjectRenderer = genaObject.GetComponentInChildren<Renderer>();
-        _snowfallParticleSystem = genaObject.GetComponentInChildren<ParticleSystem>();
+        _shopoklyakObjectRenderer = shopoklyakObject.GetComponent<Renderer>();
         
         _genaObjectRenderer.sharedMaterial.SetFloat(Amount, 1);
+        _shopoklyakObjectRenderer.sharedMaterial.SetFloat(Amount, 1);
         
         imageTracker = GetComponent<MindARImageTrackingManager>();
         imageTracker.onTargetFoundEvent += OnTargetFound;
@@ -66,6 +67,10 @@ public class ARController : MonoBehaviour
             
             Tween.StopAll(onTarget: _genaObjectRenderer.sharedMaterial);
             Tween.MaterialProperty(_genaObjectRenderer.sharedMaterial, Amount, 0, dissolveDuration);
+            
+            Tween.StopAll(onTarget: _shopoklyakObjectRenderer.sharedMaterial);
+            Tween.MaterialProperty(_shopoklyakObjectRenderer.sharedMaterial, Amount, 0, dissolveDuration);
+            
             _snowfallParticleSystem.Play();
         }
         else if (targetIndex is 2 or 3)
@@ -81,6 +86,9 @@ public class ARController : MonoBehaviour
         
         Tween.StopAll(onTarget: _genaObjectRenderer.sharedMaterial);
         Tween.MaterialProperty(_genaObjectRenderer.sharedMaterial, Amount, 1, dissolveDuration).OnComplete(() => genaObject.SetActive(false));
+        
+        Tween.StopAll(onTarget: _shopoklyakObjectRenderer.sharedMaterial);
+        Tween.MaterialProperty(_shopoklyakObjectRenderer.sharedMaterial, Amount, 1, dissolveDuration).OnComplete(() => shopoklyakObject.SetActive(false));
         _snowfallParticleSystem.Stop();
     }
 }
