@@ -9,6 +9,7 @@ public class ARController : MonoBehaviour
 {
     private static readonly int Amount = Shader.PropertyToID("_Amount");
     [SerializeField] private GameObject genaObject;
+    [SerializeField] private GameObject shopoklyakObject;
 
     [SerializeField] private RawImage transparentSampleCouple;
     [SerializeField] private float transparentSampleDuration = 0.2f;
@@ -20,14 +21,15 @@ public class ARController : MonoBehaviour
     [SerializeField] private float transparentUIDuration = 0.5f;
 
     private Renderer _genaObjectRenderer;
-    private ParticleSystem _genaObjectParticleSystem;
+    private Renderer _shopoklyakObjectRenderer;
+    [SerializeField] private ParticleSystem _snowfallParticleSystem;
 
     private MindARImageTrackingManager imageTracker;
 
     private void Start()
     {
         _genaObjectRenderer = genaObject.GetComponentInChildren<Renderer>();
-        _genaObjectParticleSystem = genaObject.GetComponentInChildren<ParticleSystem>();
+        _snowfallParticleSystem = genaObject.GetComponentInChildren<ParticleSystem>();
         
         _genaObjectRenderer.sharedMaterial.SetFloat(Amount, 1);
         
@@ -64,7 +66,7 @@ public class ARController : MonoBehaviour
             
             Tween.StopAll(onTarget: _genaObjectRenderer.sharedMaterial);
             Tween.MaterialProperty(_genaObjectRenderer.sharedMaterial, Amount, 0, dissolveDuration);
-            _genaObjectParticleSystem.Play();
+            _snowfallParticleSystem.Play();
         }
         else if (targetIndex is 2 or 3)
         {
@@ -79,6 +81,6 @@ public class ARController : MonoBehaviour
         
         Tween.StopAll(onTarget: _genaObjectRenderer.sharedMaterial);
         Tween.MaterialProperty(_genaObjectRenderer.sharedMaterial, Amount, 1, dissolveDuration).OnComplete(() => genaObject.SetActive(false));
-        _genaObjectParticleSystem.Stop();
+        _snowfallParticleSystem.Stop();
     }
 }
