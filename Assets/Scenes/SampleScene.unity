@@ -809,10 +809,10 @@ RectTransform:
   - {fileID: 27283911}
   m_Father: {fileID: 1848315366}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 430.901, y: 107}
-  m_SizeDelta: {x: 804.0215, y: 125.41333}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: -81.599, y: -710}
+  m_SizeDelta: {x: -220.97852, y: 125.41333}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &72794901
 MonoBehaviour:
@@ -969,10 +969,10 @@ RectTransform:
   - {fileID: 2112825420}
   m_Father: {fileID: 1848315366}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -97.707, y: 106.81}
-  m_SizeDelta: {x: 138.5193, y: 125.42}
+  m_AnchoredPosition: {x: 414.793, y: 106.81}
+  m_SizeDelta: {x: -886.4807, y: 125.42}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &166610779
 MonoBehaviour:
@@ -1580,8 +1580,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 5.2999268, y: -62.362366}
-  m_SizeDelta: {x: -17.951172, y: -124.26538}
+  m_AnchoredPosition: {x: 7.1376953, y: -62.362366}
+  m_SizeDelta: {x: -14.276, y: -124.2654}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &280171241
 MonoBehaviour:
@@ -2468,10 +2468,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1415326740}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 415.994, y: 665.23}
-  m_SizeDelta: {x: 83.5023, y: 85.6323}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -62, y: -65}
+  m_SizeDelta: {x: 83.50232, y: 85.632324}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &937374855
 MonoBehaviour:
@@ -2542,6 +2542,18 @@ MonoBehaviour:
           m_BoolArgument: 1
         m_CallState: 2
       - m_Target: {fileID: 261437977}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 1937917454}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
@@ -2780,6 +2792,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1937917454}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1160013324
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2933,22 +2957,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   transparentSampleCouple: {fileID: 1937917456}
-  headerRect: {fileID: 0}
-  buttonRect: {fileID: 0}
-  iconLeft: {fileID: 0}
-  iconRight: {fileID: 0}
-  transparentSampleCouplePortrait:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 988.8531
-    height: 741.6392
-  transparentSampleCoupleLandscape:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1600
-    height: 1200
 --- !u!1 &1246794330
 GameObject:
   m_ObjectHideFlags: 0
@@ -8367,8 +8375,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 550854314}
-  - {fileID: 280171240}
   - {fileID: 937374854}
+  - {fileID: 280171240}
   m_Father: {fileID: 1678310374}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -8432,7 +8440,7 @@ MonoBehaviour:
   fullViewImage: {fileID: 16715428}
   downloadButton: {fileID: 72794901}
   closeFullViewButton: {fileID: 166610779}
-  bannerPanel: {fileID: 1870158577}
+  bannerPanel: {fileID: 1248329104}
   buyTicketsButton: {fileID: 1696147992}
   closeBannerButton: {fileID: 1411073835}
   captureScript: {fileID: 252006245}
@@ -8608,7 +8616,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0.000058099027}
-  m_SizeDelta: {x: -515.8615, y: 0}
+  m_SizeDelta: {x: -518.77686, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1457799997
 MonoBehaviour:

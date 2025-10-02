@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public class GalleryManager : MonoBehaviour
 {
+    private static bool firstDownload = true;
+    
     public Transform contentParent; // Content объекта в ScrollView (Vertical Layout Group)
     public GameObject thumbnailPrefab; // Prefab: RawImage с Button
     public GameObject fullViewPanel; // Панель для увеличенного фото (с RawImage и кнопкой "Загрузить")
@@ -40,7 +42,7 @@ public class GalleryManager : MonoBehaviour
             tex.LoadImage(photoBytes);
             thumbImage.texture = tex;
 
-            thumb.GetComponent<RectTransform>().sizeDelta = new Vector2(200, 200);
+            thumb.GetComponent<RectTransform>().sizeDelta = new Vector2(400, 500);
 
             Button thumbButton = thumb.GetComponent<Button>();
             int index = i;
@@ -74,22 +76,25 @@ public class GalleryManager : MonoBehaviour
 
     private void ShowBanner()
     {
-        if (PlayerPrefs.GetInt("FirstDownload", 0) == 0)
+        // Проверяем, первая ли это загрузка в сессии
+        if (firstDownload)
         {
             bannerPanel.SetActive(true);
 
+            // Кнопка "Купить билеты"
             buyTicketsButton.onClick.AddListener(() =>
             {
                 Application.OpenURL("https://souzmultpark.ru/");
             });
 
+            // Закрыть баннер
             closeBannerButton.onClick.AddListener(() =>
             {
                 bannerPanel.SetActive(false);
             });
 
-            PlayerPrefs.SetInt("FirstDownload", 1);
-            PlayerPrefs.Save();
+            // Устанавливаем флаг, чтобы больше не показывать баннер в этой сессии
+            firstDownload = false;
         }
     }
 }
