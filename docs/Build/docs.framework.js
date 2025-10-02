@@ -2552,13 +2552,13 @@ var tempI64;
 // === Body ===
 
 var ASM_CONSTS = {
-  4854944: function() {return Module.webglContextAttributes.premultipliedAlpha;},  
- 4855005: function() {return Module.webglContextAttributes.preserveDrawingBuffer;},  
- 4855069: function() {return Module.webglContextAttributes.powerPreference;},  
- 4855127: function() {Module['emscripten_get_now_backup'] = performance.now;},  
- 4855182: function($0) {performance.now = function() { return $0; };},  
- 4855230: function($0) {performance.now = function() { return $0; };},  
- 4855278: function() {performance.now = Module['emscripten_get_now_backup'];}
+  4857440: function() {return Module.webglContextAttributes.premultipliedAlpha;},  
+ 4857501: function() {return Module.webglContextAttributes.preserveDrawingBuffer;},  
+ 4857565: function() {return Module.webglContextAttributes.powerPreference;},  
+ 4857623: function() {Module['emscripten_get_now_backup'] = performance.now;},  
+ 4857678: function($0) {performance.now = function() { return $0; };},  
+ 4857726: function($0) {performance.now = function() { return $0; };},  
+ 4857774: function() {performance.now = Module['emscripten_get_now_backup'];}
 };
 
 
@@ -16149,6 +16149,7 @@ var asmLibraryArg = {
   "invoke_v": invoke_v,
   "invoke_vfi": invoke_vfi,
   "invoke_vi": invoke_vi,
+  "invoke_vidd": invoke_vidd,
   "invoke_vidi": invoke_vidi,
   "invoke_viffffi": invoke_viffffi,
   "invoke_vifffi": invoke_vifffi,
@@ -17617,6 +17618,9 @@ var dynCall_viijijj = Module["dynCall_viijijj"] = createExportWrapper("dynCall_v
 var dynCall_viiiij = Module["dynCall_viiiij"] = createExportWrapper("dynCall_viiiij");
 
 /** @type {function(...*):?} */
+var dynCall_vidd = Module["dynCall_vidd"] = createExportWrapper("dynCall_vidd");
+
+/** @type {function(...*):?} */
 var dynCall_iiiiiifffiiifiii = Module["dynCall_iiiiiifffiiifiii"] = createExportWrapper("dynCall_iiiiiifffiiifiii");
 
 /** @type {function(...*):?} */
@@ -18453,6 +18457,17 @@ function invoke_viiffiiiffii(index,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11) {
   var sp = stackSave();
   try {
     dynCall_viiffiiiffii(index,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
+}
+
+function invoke_vidd(index,a1,a2,a3) {
+  var sp = stackSave();
+  try {
+    dynCall_vidd(index,a1,a2,a3);
   } catch(e) {
     stackRestore(sp);
     if (e !== e+0) throw e;

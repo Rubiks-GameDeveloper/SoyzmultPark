@@ -1,36 +1,58 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using PrimeTween;
 using UnityEngine;
 using UnityEngine.UI;
+
+public class PhotoBuffer
+{
+    public static List<byte[]> Photos = new List<byte[]>();
+}
 
 public class ScreenshotCapture : MonoBehaviour
 {
     [DllImport("__Internal")]
     private static extern void DownloadFile(byte[] array, int byteLength, string fileName);
 
-    public Button saveButton; // Кнопка "Сохранить" в UI
+    [SerializeField] private Image cameraShotVisual;
+    [SerializeField] private float shotDuration;
+    
+    public Button captureButton;
+    public Button galleryButton;
+    public GameObject galleryPanel;
 
     void Start()
     {
-        if (saveButton != null)
+        if (captureButton != null)
         {
-            saveButton.onClick.AddListener(CaptureAndDownload);
+            captureButton.onClick.AddListener(CaptureAndAddToBuffer);
         }
-        else
+        if (galleryButton != null)
         {
-            Debug.LogError("Save Button is not assigned in the Inspector!");
+            galleryButton.onClick.AddListener(OpenGallery);
         }
     }
 
-    public void CaptureAndDownload()
+    public void CaptureAndAddToBuffer()
     {
-        StartCoroutine(TakeScreenshot());
+        Sequence.Create(1, CycleMode.Yoyo)
+            .Chain(Tween.Alpha(cameraShotVisual, 1, shotDuration))
+            .Chain(Tween.Alpha(cameraShotVisual, 0, shotDuration));
+        StartCoroutine(TakeScreenshot(addToBuffer: true));
     }
 
-    private IEnumerator TakeScreenshot()
+    public void DownloadPhoto(byte[] photoBytes)
     {
-        yield return new WaitForEndOfFrame(); // Ждать конца кадра для AR-вида
+        string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+        string fileName = $"ar_photo_{timestamp}.png";
+        DownloadFile(photoBytes, photoBytes.Length, fileName);
+    }
+
+    private IEnumerator TakeScreenshot(bool addToBuffer = false)
+    {
+        yield return new WaitForEndOfFrame();
 
         int width = Screen.width;
         int height = Screen.height;
@@ -41,11 +63,15 @@ public class ScreenshotCapture : MonoBehaviour
         byte[] bytes = screenshot.EncodeToPNG();
         Destroy(screenshot);
 
-        // Формируем имя файла с датой и временем
-        string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-        string fileName = $"ar_photo_{timestamp}.png";
+        if (addToBuffer)
+        {
+            PhotoBuffer.Photos.Add(bytes);
+            Debug.Log("Фото добавлено в буфер. Всего фото: " + PhotoBuffer.Photos.Count);
+        }
+    }
 
-        // Скачать файл
-        DownloadFile(bytes, bytes.Length, fileName);
+    private void OpenGallery()
+    {
+        galleryPanel.SetActive(true);
     }
 }

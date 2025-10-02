@@ -6,15 +6,10 @@ public class OrientationAdapter : MonoBehaviour
 {
     [SerializeField] private RawImage transparentSampleCouple;
     
-    public RectTransform headerRect; // HeaderText
-    public RectTransform buttonRect; // SaveButton
-    public RectTransform iconLeft; // CharacterIconLeft
-    public RectTransform iconRight; // CharacterIconRight
-    
     private ScreenOrientation _previousOrientation = ScreenOrientation.Portrait;
 
-    [SerializeField] private Rect transparentSampleCouplePortrait;
-    [SerializeField] private Rect transparentSampleCoupleLandscape;
+    private Rect transparentSampleCouplePortrait;
+    private Rect transparentSampleCoupleLandscape;
 
     private void Start()
     {
@@ -23,7 +18,7 @@ public class OrientationAdapter : MonoBehaviour
         transparentSampleCouplePortrait.width = Display.main.systemWidth - 100;
         transparentSampleCouplePortrait.height = transparentSampleCouplePortrait.width / 4 * 3 - 100;
         
-        transparentSampleCoupleLandscape.width = Display.main.systemHeight - 100;
+        transparentSampleCoupleLandscape.width = Display.main.systemHeight - 400;
         transparentSampleCoupleLandscape.height = transparentSampleCoupleLandscape.width / 4 * 3 - 100;
         
         

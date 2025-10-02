@@ -13,7 +13,8 @@ public class ARController : MonoBehaviour
     [SerializeField] private RawImage transparentSampleCouple;
     [SerializeField] private float transparentSampleDuration = 0.2f;
     
-    [SerializeField] private List<Graphic> imageList = new();
+    [SerializeField] private List<Graphic> imageListToDisable = new();
+    [SerializeField] private List<Graphic> imageListToEnable = new();
     
     [SerializeField] private float dissolveDuration = 0.5f;
     [SerializeField] private float transparentUIDuration = 0.5f;
@@ -36,10 +37,15 @@ public class ARController : MonoBehaviour
 
         imageTracker.OnARStarted += () =>
         {
-            foreach (var image in imageList)
+            foreach (var image in imageListToDisable)
             {
                 Tween.Alpha(image, 0, transparentUIDuration).
                     OnComplete(() => Tween.Alpha(transparentSampleCouple, 0.5f, transparentSampleDuration));
+            }
+            
+            foreach (var image in imageListToEnable)
+            {
+                Tween.Alpha(image, 1, transparentUIDuration);
             }
         };
     }
