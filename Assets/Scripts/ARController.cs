@@ -22,6 +22,8 @@ public class ARController : MonoBehaviour
 
     [SerializeField] private List<Renderer> rendersToDissolve;
     [SerializeField] private ParticleSystem _snowfallParticleSystem;
+    
+    [SerializeField] private HatController hatController;
 
     private MindARImageTrackingManager imageTracker;
 
@@ -30,6 +32,12 @@ public class ARController : MonoBehaviour
         foreach (var render in rendersToDissolve)
         {
             render.sharedMaterial.SetFloat(Amount, 1);
+        }
+        
+        // Добавляем рендереры шапок в список для анимации dissolve
+        if (hatController != null)
+        {
+            AddHatRenderersToDissolveList();
         }
         
         imageTracker = GetComponent<MindARImageTrackingManager>();
@@ -51,6 +59,43 @@ public class ARController : MonoBehaviour
         };
     }
     
+    private void AddHatRenderersToDissolveList()
+    {
+        // Подписываемся на изменение шапок
+        if (hatController != null)
+        {
+            hatController.OnHatTypeChanged += OnHatTypeChanged;
+        }
+    }
+    
+    private void OnHatTypeChanged(HatType hatType)
+    {
+        // Обновляем список рендереров для анимации dissolve
+        UpdateRendersToDissolve();
+    }
+    
+    private void UpdateRendersToDissolve()
+    {
+        if (hatController == null) return;
+        
+        // Получаем активные рендереры шапок
+        var hatRenderers = hatController.GetActiveHatRenderers();
+        
+        // Добавляем их в список для анимации (если еще не добавлены)
+        foreach (var renderer in hatRenderers)
+        {
+            if (!rendersToDissolve.Contains(renderer))
+            {
+                rendersToDissolve.Add(renderer);
+                // Инициализируем материал для dissolve эффекта
+                if (renderer.sharedMaterial != null)
+                {
+                    renderer.sharedMaterial.SetFloat(Amount, 1);
+                }
+            }
+        }
+    }
+    
     
 
     private void OnTargetFound(int targetIndex)
@@ -58,16 +103,21 @@ public class ARController : MonoBehaviour
         print("Target found: " + targetIndex);
         if (targetIndex is 0 or 1)
         {
+            // Обновляем список рендереров перед показом
+            UpdateRendersToDissolve();
             
             Tween.StopAll(onTarget: transparentSampleCouple);
             Tween.Alpha(transparentSampleCouple, 0, transparentSampleDuration);
 
             foreach (var renderer in rendersToDissolve)
             {
-                Tween.CompleteAll(onTarget: renderer.sharedMaterial);
-                Tween.MaterialProperty(renderer.sharedMaterial, Amount, 0, dissolveDuration);
-                
-                renderer.gameObject.SetActive(true);
+                if (renderer != null && renderer.sharedMaterial != null)
+                {
+                    Tween.CompleteAll(onTarget: renderer.sharedMaterial);
+                    Tween.MaterialProperty(renderer.sharedMaterial, Amount, 0, dissolveDuration);
+                    
+                    renderer.gameObject.SetActive(true);
+                }
             }
             
             _snowfallParticleSystem.Play();

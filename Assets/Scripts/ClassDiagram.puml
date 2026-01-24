@@ -1,0 +1,65 @@
+﻿@startuml
+class ARController {
+    - genaObject : GameObject
+    - shopoklyakObject : GameObject
+    - transparentSampleCouple : RawImage
+    - rendersToDissolve : List<Renderer>
+    - _snowfallParticleSystem : ParticleSystem
+    - imageTracker : MindARImageTrackingManager
+    - Start() : void
+    - OnTargetFound(targetIndex : int) : void
+    - OnTargetLost(targetIndex : int) : void
+}
+class GalleryManager {
+    + contentParent : Transform
+    + thumbnailPrefab : GameObject
+    + fullViewPanel : GameObject
+    + fullViewImage : RawImage
+    + downloadButton : Button
+    + closeFullViewButton : Button
+    + bannerPanel : GameObject
+    + buyTicketsButton : Button
+    + closeBannerButton : Button
+    + captureScript : ScreenshotCapture
+    - currentPhotos : List<byte[]>
+    - selectedPhoto : byte[]
+    - LoadGallery() : void
+    - ShowFullView(index : int) : void
+    - ShowBanner() : void
+}
+class OrientationAdapter {
+    - transparentSampleCouple : RawImage
+    - transparentSampleCouplePortrait : Rect
+    - transparentSampleCoupleLandscape : Rect
+    - Start() : void
+    - Update() : void
+    - UpdateUI() : void
+}
+class PhotoBuffer {
+    + captureButton : Button
+    + galleryButton : Button
+    + galleryPanel : GameObject
+    + uiCanvas : Canvas
+    - arCamera : Camera
+    + CaptureAndAddToBuffer() : void
+    + DownloadPhoto(photoBytes : byte[]) : void
+    - TakeScreenshotWithoutUI(addToBuffer : bool) : IEnumerator
+    - OpenGallery() : void
+}
+class ScreenshotCapture {
+    + captureButton : Button
+    + galleryButton : Button
+    + galleryPanel : GameObject
+    + uiCanvas : Canvas
+    - arCamera : Camera
+    + CaptureAndAddToBuffer() : void
+    + DownloadPhoto(photoBytes : byte[]) : void
+    - TakeScreenshotWithoutUI(addToBuffer : bool) : IEnumerator
+    - OpenGallery() : void
+}
+MonoBehaviour <|-- ARController
+MonoBehaviour <|-- GalleryManager
+MonoBehaviour <|-- OrientationAdapter
+MonoBehaviour <|-- ScreenshotCapture
+GalleryManager --> ScreenshotCapture : field
+@enduml
