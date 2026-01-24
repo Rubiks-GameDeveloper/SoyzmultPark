@@ -29,11 +29,10 @@ public class HatController : MonoBehaviour
         public GameObject characterObject;
         public GameObject kokoshnikInstance;
         public GameObject borodaInstance;
-        public GameObject helmetInstance;
+        public GameObject helmetDefaultInstance;  // Каска по умолчанию
+        public GameObject helmetBlueInstance;     // Синяя каска
+        public GameObject helmetWhiteInstance;    // Белая каска
         public GameObject orangeBoxInstance;
-        
-        // Рендерер каски (один, но с разными материалами)
-        public Renderer helmetRenderer;
     }
     
     [Header("Character Settings")]
@@ -177,18 +176,18 @@ public class HatController : MonoBehaviour
             orangeBoxPrefab = FindModelInScene("SecretofOrange") ?? FindModelInScene("orange") ?? LoadModelFromAssets("Models/orange_box/SecretofOrange");
         }
         
-        // Автоматически находим текстуры касок
+        // Автоматически находим текстуры касок из папки Assets/Models/helmet/
         if (helmetDefaultTexture == null)
         {
-            helmetDefaultTexture = LoadTexture("Models/helmet/lambert1_Base");
+            helmetDefaultTexture = LoadTextureFromAssets("lambert1_Base");
         }
         if (helmetBlueTexture == null)
         {
-            helmetBlueTexture = LoadTexture("Models/helmet/lambert1_blue_Base");
+            helmetBlueTexture = LoadTextureFromAssets("lambert1_blue_Base");
         }
         if (helmetWhiteTexture == null)
         {
-            helmetWhiteTexture = LoadTexture("Models/helmet/lambert1_white_Base");
+            helmetWhiteTexture = LoadTextureFromAssets("lambert1_white_Base");
         }
     }
     
@@ -249,12 +248,39 @@ public class HatController : MonoBehaviour
         return null;
     }
     
+    private Texture2D LoadTextureFromAssets(string textureName)
+    {
+        // Пытаемся найти текстуру в папке Assets/Models/helmet/
+        #if UNITY_EDITOR
+        string[] guids = AssetDatabase.FindAssets(textureName + " t:Texture2D");
+        foreach (string guid in guids)
+        {
+            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            // Проверяем, что текстура находится в папке helmet
+            if (assetPath.ToLower().Contains("helmet") && assetPath.ToLower().Contains(textureName.ToLower()))
+            {
+                Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(assetPath);
+                if (texture != null)
+                {
+                    return texture;
+                }
+            }
+        }
+        #endif
+        
+        // Пытаемся загрузить через Resources как fallback
+        return Resources.Load<Texture2D>("Models/helmet/" + textureName);
+    }
+    
     private void InitializeHats()
     {
-        // Загружаем текстуры и создаем материалы перед инициализацией персонажей
+        // ШАГ 1: Загружаем текстуры
         LoadHelmetTextures();
         
-        // Инициализация шапок для всех персонажей
+        // ШАГ 2: Создаем материалы (нужно сделать до создания экземпляров касок)
+        CreateHelmetMaterials();
+        
+        // ШАГ 3: Инициализация шапок для всех персонажей
         foreach (var characterHats in characters)
         {
             if (characterHats != null && characterHats.characterObject != null)
@@ -263,10 +289,21 @@ public class HatController : MonoBehaviour
             }
         }
         
-        // Создаем материалы после инициализации рендереров
-        CreateHelmetMaterials();
+        // ШАГ 4: Применяем материалы к созданным каскам (если они еще не применены)
+        foreach (var characterHats in characters)
+        {
+            if (characterHats != null && characterHats.characterObject != null)
+            {
+                if (characterHats.helmetDefaultInstance != null)
+                    ApplyHelmetMaterial(characterHats.helmetDefaultInstance, HelmetColor.Default);
+                if (characterHats.helmetBlueInstance != null)
+                    ApplyHelmetMaterial(characterHats.helmetBlueInstance, HelmetColor.Blue);
+                if (characterHats.helmetWhiteInstance != null)
+                    ApplyHelmetMaterial(characterHats.helmetWhiteInstance, HelmetColor.White);
+            }
+        }
         
-        // Скрываем все шапки по умолчанию
+        // ШАГ 5: Скрываем все шапки по умолчанию
         SetHatType(HatType.None);
     }
     
@@ -275,10 +312,10 @@ public class HatController : MonoBehaviour
         // Создаем кокошник
         if (hats.kokoshnikInstance == null)
         {
-            GameObject prefab = GetModelPrefab(kokoshnikPrefab, kokoshnikModelPath);
-            if (prefab != null)
+            GameObject kokoshnikModel = GetModelPrefab(kokoshnikPrefab, kokoshnikModelPath);
+            if (kokoshnikModel != null)
             {
-                hats.kokoshnikInstance = Instantiate(prefab, parent);
+                hats.kokoshnikInstance = Instantiate(kokoshnikModel, parent);
                 hats.kokoshnikInstance.SetActive(false);
             }
         }
@@ -286,35 +323,53 @@ public class HatController : MonoBehaviour
         // Создаем бороду
         if (hats.borodaInstance == null)
         {
-            GameObject prefab = GetModelPrefab(borodaPrefab, borodaModelPath);
-            if (prefab != null)
+            GameObject borodaModel = GetModelPrefab(borodaPrefab, borodaModelPath);
+            if (borodaModel != null)
             {
-                hats.borodaInstance = Instantiate(prefab, parent);
+                hats.borodaInstance = Instantiate(borodaModel, parent);
                 hats.borodaInstance.SetActive(false);
             }
         }
         
-        // Создаем каску
-        if (hats.helmetInstance == null)
+        // Создаем 3 варианта каски с разными цветами
+        GameObject helmetModel = GetModelPrefab(helmetPrefab, helmetModelPath);
+        if (helmetModel != null)
         {
-            GameObject prefab = GetModelPrefab(helmetPrefab, helmetModelPath);
-            if (prefab != null)
+            // Каска по умолчанию
+            if (hats.helmetDefaultInstance == null)
             {
-                hats.helmetInstance = Instantiate(prefab, parent);
-                hats.helmetInstance.SetActive(false);
-                
-                // Получаем рендерер каски
-                hats.helmetRenderer = hats.helmetInstance.GetComponentInChildren<Renderer>();
+                hats.helmetDefaultInstance = Instantiate(helmetModel, parent);
+                hats.helmetDefaultInstance.name = "Helmet_Default";
+                hats.helmetDefaultInstance.SetActive(false);
+                ApplyHelmetMaterial(hats.helmetDefaultInstance, HelmetColor.Default);
+            }
+            
+            // Синяя каска
+            if (hats.helmetBlueInstance == null)
+            {
+                hats.helmetBlueInstance = Instantiate(helmetModel, parent);
+                hats.helmetBlueInstance.name = "Helmet_Blue";
+                hats.helmetBlueInstance.SetActive(false);
+                ApplyHelmetMaterial(hats.helmetBlueInstance, HelmetColor.Blue);
+            }
+            
+            // Белая каска
+            if (hats.helmetWhiteInstance == null)
+            {
+                hats.helmetWhiteInstance = Instantiate(helmetModel, parent);
+                hats.helmetWhiteInstance.name = "Helmet_White";
+                hats.helmetWhiteInstance.SetActive(false);
+                ApplyHelmetMaterial(hats.helmetWhiteInstance, HelmetColor.White);
             }
         }
         
         // Создаем ящик
         if (hats.orangeBoxInstance == null)
         {
-            GameObject prefab = GetModelPrefab(orangeBoxPrefab, orangeBoxModelPath);
-            if (prefab != null)
+            GameObject orangeBoxModel = GetModelPrefab(orangeBoxPrefab, orangeBoxModelPath);
+            if (orangeBoxModel != null)
             {
-                hats.orangeBoxInstance = Instantiate(prefab, parent);
+                hats.orangeBoxInstance = Instantiate(orangeBoxModel, parent);
                 hats.orangeBoxInstance.SetActive(false);
             }
         }
@@ -368,61 +423,132 @@ public class HatController : MonoBehaviour
     private void CreateHelmetMaterials()
     {
         // Создаем материалы для разных цветов, если они не назначены
-        Renderer helmetRenderer = null;
-        foreach (var characterHats in characters)
+        // Получаем базовый материал из префаба каски
+        GameObject prefab = GetModelPrefab(helmetPrefab, helmetModelPath);
+        Material baseMaterial = null;
+        
+        if (prefab != null)
         {
-            if (characterHats != null && characterHats.helmetRenderer != null)
+            Renderer prefabRenderer = prefab.GetComponentInChildren<Renderer>();
+            if (prefabRenderer != null && prefabRenderer.sharedMaterial != null)
             {
-                helmetRenderer = characterHats.helmetRenderer;
-                break;
+                baseMaterial = prefabRenderer.sharedMaterial;
             }
         }
         
-        if (helmetDefaultMaterial == null && helmetRenderer != null)
+        // Если базовый материал не найден, используем материал из существующего экземпляра
+        if (baseMaterial == null)
         {
-            // Используем материал из рендерера как базовый
-            Material baseMaterial = helmetRenderer.sharedMaterial;
-            if (baseMaterial != null)
+            foreach (var characterHats in characters)
             {
-                helmetDefaultMaterial = new Material(baseMaterial);
-                if (helmetDefaultTexture != null)
+                if (characterHats != null && characterHats.helmetDefaultInstance != null)
                 {
-                    // Пробуем разные имена свойств текстуры
-                    if (helmetDefaultMaterial.HasProperty("_MainTexture"))
-                        helmetDefaultMaterial.SetTexture("_MainTexture", helmetDefaultTexture);
-                    else if (helmetDefaultMaterial.HasProperty("_BaseMap"))
-                        helmetDefaultMaterial.SetTexture("_BaseMap", helmetDefaultTexture);
-                    else if (helmetDefaultMaterial.HasProperty("_MainTex"))
-                        helmetDefaultMaterial.SetTexture("_MainTex", helmetDefaultTexture);
+                    Renderer renderer = characterHats.helmetDefaultInstance.GetComponentInChildren<Renderer>();
+                    if (renderer != null && renderer.sharedMaterial != null)
+                    {
+                        baseMaterial = renderer.sharedMaterial;
+                        break;
+                    }
                 }
             }
         }
         
-        if (helmetBlueMaterial == null && helmetDefaultMaterial != null)
+        // Создаем материал для каски по умолчанию
+        if (helmetDefaultMaterial == null && baseMaterial != null)
         {
-            helmetBlueMaterial = new Material(helmetDefaultMaterial);
-            if (helmetBlueTexture != null)
+            helmetDefaultMaterial = new Material(baseMaterial);
+            ApplyTextureToMaterial(helmetDefaultMaterial, helmetDefaultTexture);
+        }
+        
+        // Создаем материал для синей каски
+        if (helmetBlueMaterial == null)
+        {
+            if (helmetDefaultMaterial != null)
             {
-                if (helmetBlueMaterial.HasProperty("_MainTexture"))
-                    helmetBlueMaterial.SetTexture("_MainTexture", helmetBlueTexture);
-                else if (helmetBlueMaterial.HasProperty("_BaseMap"))
-                    helmetBlueMaterial.SetTexture("_BaseMap", helmetBlueTexture);
-                else if (helmetBlueMaterial.HasProperty("_MainTex"))
-                    helmetBlueMaterial.SetTexture("_MainTex", helmetBlueTexture);
+                helmetBlueMaterial = new Material(helmetDefaultMaterial);
+            }
+            else if (baseMaterial != null)
+            {
+                helmetBlueMaterial = new Material(baseMaterial);
+            }
+            ApplyTextureToMaterial(helmetBlueMaterial, helmetBlueTexture);
+        }
+        
+        // Создаем материал для белой каски
+        if (helmetWhiteMaterial == null)
+        {
+            if (helmetDefaultMaterial != null)
+            {
+                helmetWhiteMaterial = new Material(helmetDefaultMaterial);
+            }
+            else if (baseMaterial != null)
+            {
+                helmetWhiteMaterial = new Material(baseMaterial);
+            }
+            ApplyTextureToMaterial(helmetWhiteMaterial, helmetWhiteTexture);
+        }
+    }
+    
+    private void ApplyTextureToMaterial(Material material, Texture2D texture)
+    {
+        if (material == null || texture == null) return;
+        
+        // Пробуем разные имена свойств текстуры
+        if (material.HasProperty("_MainTexture"))
+            material.SetTexture("_MainTexture", texture);
+        else if (material.HasProperty("_BaseMap"))
+            material.SetTexture("_BaseMap", texture);
+        else if (material.HasProperty("_MainTex"))
+            material.SetTexture("_MainTex", texture);
+        else if (material.HasProperty("_BaseColorMap"))
+            material.SetTexture("_BaseColorMap", texture);
+    }
+    
+    private void ApplyHelmetMaterial(GameObject helmetInstance, HelmetColor color)
+    {
+        if (helmetInstance == null) return;
+        
+        Material materialToUse = null;
+        switch (color)
+        {
+            case HelmetColor.Default:
+                materialToUse = helmetDefaultMaterial;
+                break;
+            case HelmetColor.Blue:
+                materialToUse = helmetBlueMaterial;
+                break;
+            case HelmetColor.White:
+                materialToUse = helmetWhiteMaterial;
+                break;
+        }
+        
+        // Если материал еще не создан, создаем его сейчас
+        if (materialToUse == null)
+        {
+            CreateHelmetMaterials();
+            switch (color)
+            {
+                case HelmetColor.Default:
+                    materialToUse = helmetDefaultMaterial;
+                    break;
+                case HelmetColor.Blue:
+                    materialToUse = helmetBlueMaterial;
+                    break;
+                case HelmetColor.White:
+                    materialToUse = helmetWhiteMaterial;
+                    break;
             }
         }
         
-        if (helmetWhiteMaterial == null && helmetDefaultMaterial != null)
+        if (materialToUse != null)
         {
-            helmetWhiteMaterial = new Material(helmetDefaultMaterial);
-            if (helmetWhiteTexture != null)
+            Renderer[] renderers = helmetInstance.GetComponentsInChildren<Renderer>();
+            foreach (Renderer renderer in renderers)
             {
-                if (helmetWhiteMaterial.HasProperty("_MainTexture"))
-                    helmetWhiteMaterial.SetTexture("_MainTexture", helmetWhiteTexture);
-                else if (helmetWhiteMaterial.HasProperty("_BaseMap"))
-                    helmetWhiteMaterial.SetTexture("_BaseMap", helmetWhiteTexture);
-                else if (helmetWhiteMaterial.HasProperty("_MainTex"))
-                    helmetWhiteMaterial.SetTexture("_MainTex", helmetWhiteTexture);
+                if (renderer != null)
+                {
+                    renderer.sharedMaterial = materialToUse;
+                }
             }
         }
     }
@@ -491,9 +617,24 @@ public class HatController : MonoBehaviour
                 }
                 break;
             case HatType.Helmet:
-                if (hats.helmetInstance != null && hats.helmetRenderer != null)
+                // Добавляем рендерер активной каски (в зависимости от выбранного цвета)
+                GameObject activeHelmet = null;
+                switch (currentHelmetColor)
                 {
-                    renderers.Add(hats.helmetRenderer);
+                    case HelmetColor.Default:
+                        activeHelmet = hats.helmetDefaultInstance;
+                        break;
+                    case HelmetColor.Blue:
+                        activeHelmet = hats.helmetBlueInstance;
+                        break;
+                    case HelmetColor.White:
+                        activeHelmet = hats.helmetWhiteInstance;
+                        break;
+                }
+                
+                if (activeHelmet != null)
+                {
+                    renderers.AddRange(activeHelmet.GetComponentsInChildren<Renderer>());
                 }
                 break;
             case HatType.OrangeBox:
@@ -511,6 +652,7 @@ public class HatController : MonoBehaviour
         
         if (currentHatType == HatType.Helmet)
         {
+            // Обновляем активные каски для всех персонажей
             foreach (var characterHats in characters)
             {
                 if (characterHats != null)
@@ -518,31 +660,31 @@ public class HatController : MonoBehaviour
                     UpdateHelmetColors(characterHats, color);
                 }
             }
+            
+            // Уведомляем об изменении, чтобы обновить rendersToDissolve
+            OnHatTypeChanged?.Invoke(HatType.Helmet);
         }
     }
     
     private void UpdateHelmetColors(CharacterHats hats, HelmetColor color)
     {
-        if (hats.helmetRenderer == null) return;
+        // Скрываем все варианты каски
+        if (hats.helmetDefaultInstance != null) hats.helmetDefaultInstance.SetActive(false);
+        if (hats.helmetBlueInstance != null) hats.helmetBlueInstance.SetActive(false);
+        if (hats.helmetWhiteInstance != null) hats.helmetWhiteInstance.SetActive(false);
         
-        // Меняем материал рендерера в зависимости от выбранного цвета
-        Material materialToUse = null;
+        // Показываем выбранный вариант
         switch (color)
         {
             case HelmetColor.Default:
-                materialToUse = helmetDefaultMaterial;
+                if (hats.helmetDefaultInstance != null) hats.helmetDefaultInstance.SetActive(true);
                 break;
             case HelmetColor.Blue:
-                materialToUse = helmetBlueMaterial;
+                if (hats.helmetBlueInstance != null) hats.helmetBlueInstance.SetActive(true);
                 break;
             case HelmetColor.White:
-                materialToUse = helmetWhiteMaterial;
+                if (hats.helmetWhiteInstance != null) hats.helmetWhiteInstance.SetActive(true);
                 break;
-        }
-        
-        if (materialToUse != null)
-        {
-            hats.helmetRenderer.sharedMaterial = materialToUse;
         }
     }
     
@@ -550,7 +692,9 @@ public class HatController : MonoBehaviour
     {
         if (hats.kokoshnikInstance != null) hats.kokoshnikInstance.SetActive(false);
         if (hats.borodaInstance != null) hats.borodaInstance.SetActive(false);
-        if (hats.helmetInstance != null) hats.helmetInstance.SetActive(false);
+        if (hats.helmetDefaultInstance != null) hats.helmetDefaultInstance.SetActive(false);
+        if (hats.helmetBlueInstance != null) hats.helmetBlueInstance.SetActive(false);
+        if (hats.helmetWhiteInstance != null) hats.helmetWhiteInstance.SetActive(false);
         if (hats.orangeBoxInstance != null) hats.orangeBoxInstance.SetActive(false);
     }
     
@@ -565,10 +709,17 @@ public class HatController : MonoBehaviour
                 if (hats.borodaInstance != null) hats.borodaInstance.SetActive(active);
                 break;
             case HatType.Helmet:
-                if (hats.helmetInstance != null)
+                if (active)
                 {
-                    hats.helmetInstance.SetActive(active);
-                    if (active) UpdateHelmetColors(hats, currentHelmetColor);
+                    // Показываем каску выбранного цвета
+                    UpdateHelmetColors(hats, currentHelmetColor);
+                }
+                else
+                {
+                    // Скрываем все варианты каски
+                    if (hats.helmetDefaultInstance != null) hats.helmetDefaultInstance.SetActive(false);
+                    if (hats.helmetBlueInstance != null) hats.helmetBlueInstance.SetActive(false);
+                    if (hats.helmetWhiteInstance != null) hats.helmetWhiteInstance.SetActive(false);
                 }
                 break;
             case HatType.OrangeBox:
