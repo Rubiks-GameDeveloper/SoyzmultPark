@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public enum HatType
 {
@@ -33,13 +36,24 @@ public class HatController : MonoBehaviour
         public Renderer helmetRenderer;
     }
     
-    [SerializeField] private CharacterHats genaHats;
-    [SerializeField] private CharacterHats shopoklyakHats;
+    [Header("Character Settings")]
+    [Tooltip("Автоматически найти персонажей в сцене (если включено, массив Characters будет заполнен автоматически)")]
+    [SerializeField] private bool autoFindCharacters = true;
     
+    [Tooltip("Список персонажей. Если Auto Find Characters включено, можно оставить пустым")]
+    [SerializeField] private CharacterHats[] characters = new CharacterHats[3];
+    
+    [Header("Model References (drag FBX files or prefabs here)")]
     [SerializeField] private GameObject kokoshnikPrefab;
     [SerializeField] private GameObject borodaPrefab;
     [SerializeField] private GameObject helmetPrefab;
     [SerializeField] private GameObject orangeBoxPrefab;
+    
+    [Header("Or use direct model paths (alternative to prefabs)")]
+    [SerializeField] private string kokoshnikModelPath = "Models/kokoshnik/kokoshnik";
+    [SerializeField] private string borodaModelPath = "Models/boroda/boroda";
+    [SerializeField] private string helmetModelPath = "Models/helmet/hamlet";
+    [SerializeField] private string orangeBoxModelPath = "Models/orange_box/SecretofOrange";
     
     [Header("Helmet Materials")]
     [SerializeField] private Material helmetDefaultMaterial;
@@ -61,7 +75,178 @@ public class HatController : MonoBehaviour
     
     private void Start()
     {
+        // Автоматически находим персонажей, если нужно
+        if (autoFindCharacters)
+        {
+            AutoFindCharacters();
+        }
+        
+        // Автоматически находим модели, если они не назначены
+        AutoFindReferences();
         InitializeHats();
+    }
+    
+    private void AutoFindCharacters()
+    {
+        // Ищем все объекты с рендерерами, которые могут быть персонажами
+        // Ищем по именам или по наличию определенных компонентов
+        List<GameObject> foundCharacters = new List<GameObject>();
+        
+        // Метод 1: Ищем по именам (если персонажи имеют характерные имена)
+        string[] characterNames = { "gena", "shopoklyak", "cheburashka", "character", "персонаж" };
+        GameObject[] allObjects = FindObjectsOfType<GameObject>();
+        
+        foreach (GameObject obj in allObjects)
+        {
+            string objName = obj.name.ToLower();
+            foreach (string charName in characterNames)
+            {
+                if (objName.Contains(charName) && !foundCharacters.Contains(obj))
+                {
+                    // Проверяем, что это действительно персонаж (есть рендерер или меш)
+                    if (obj.GetComponentInChildren<Renderer>() != null || obj.GetComponentInChildren<MeshFilter>() != null)
+                    {
+                        foundCharacters.Add(obj);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Метод 2: Если не нашли по именам, ищем объекты с префабами моделей
+        if (foundCharacters.Count < 3)
+        {
+            // Ищем объекты, которые являются экземплярами префабов персонажей
+            foreach (GameObject obj in allObjects)
+            {
+                if (foundCharacters.Count >= 3) break;
+                
+                // Проверяем, что объект имеет дочерние объекты с рендерерами
+                Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+                if (renderers.Length > 0 && !foundCharacters.Contains(obj))
+                {
+                    // Проверяем, что это не UI элемент
+                    if (obj.GetComponent<Canvas>() == null && obj.GetComponent<RectTransform>() == null)
+                    {
+                        foundCharacters.Add(obj);
+                    }
+                }
+            }
+        }
+        
+        // Заполняем массив characters
+        if (foundCharacters.Count > 0)
+        {
+            // Создаем массив нужного размера
+            System.Array.Resize(ref characters, Mathf.Max(3, foundCharacters.Count));
+            
+            for (int i = 0; i < foundCharacters.Count && i < characters.Length; i++)
+            {
+                if (characters[i] == null)
+                {
+                    characters[i] = new CharacterHats();
+                }
+                characters[i].characterObject = foundCharacters[i];
+            }
+            
+            Debug.Log($"Найдено персонажей: {foundCharacters.Count}");
+        }
+        else
+        {
+            Debug.LogWarning("Не удалось автоматически найти персонажей. Назначьте их вручную в Inspector.");
+        }
+    }
+    
+    private void AutoFindReferences()
+    {
+        // Автоматически находим модели, если они не назначены
+        if (kokoshnikPrefab == null)
+        {
+            kokoshnikPrefab = FindModelInScene("kokoshnik") ?? LoadModelFromAssets("Models/kokoshnik/kokoshnik");
+        }
+        if (borodaPrefab == null)
+        {
+            borodaPrefab = FindModelInScene("boroda") ?? LoadModelFromAssets("Models/boroda/boroda");
+        }
+        if (helmetPrefab == null)
+        {
+            helmetPrefab = FindModelInScene("hamlet") ?? FindModelInScene("helmet") ?? LoadModelFromAssets("Models/helmet/hamlet");
+        }
+        if (orangeBoxPrefab == null)
+        {
+            orangeBoxPrefab = FindModelInScene("SecretofOrange") ?? FindModelInScene("orange") ?? LoadModelFromAssets("Models/orange_box/SecretofOrange");
+        }
+        
+        // Автоматически находим текстуры касок
+        if (helmetDefaultTexture == null)
+        {
+            helmetDefaultTexture = LoadTexture("Models/helmet/lambert1_Base");
+        }
+        if (helmetBlueTexture == null)
+        {
+            helmetBlueTexture = LoadTexture("Models/helmet/lambert1_blue_Base");
+        }
+        if (helmetWhiteTexture == null)
+        {
+            helmetWhiteTexture = LoadTexture("Models/helmet/lambert1_white_Base");
+        }
+    }
+    
+    private GameObject FindModelInScene(string nameContains)
+    {
+        GameObject[] allObjects = FindObjectsOfType<GameObject>();
+        foreach (GameObject obj in allObjects)
+        {
+            if (obj.name.ToLower().Contains(nameContains.ToLower()))
+            {
+                return obj;
+            }
+        }
+        return null;
+    }
+    
+    private GameObject LoadModelFromAssets(string path)
+    {
+        // Пытаемся загрузить через Resources
+        GameObject loaded = Resources.Load<GameObject>(path);
+        if (loaded != null) return loaded;
+        
+        // Пытаемся найти через AssetDatabase (только в Editor)
+        #if UNITY_EDITOR
+        string[] guids = AssetDatabase.FindAssets("t:GameObject " + System.IO.Path.GetFileName(path));
+        foreach (string guid in guids)
+        {
+            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            if (assetPath.ToLower().Contains(path.Replace("Models/", "").ToLower()))
+            {
+                return AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+            }
+        }
+        #endif
+        
+        return null;
+    }
+    
+    private Texture2D LoadTexture(string path)
+    {
+        // Пытаемся загрузить через Resources
+        Texture2D loaded = Resources.Load<Texture2D>(path);
+        if (loaded != null) return loaded;
+        
+        // Пытаемся найти через AssetDatabase (только в Editor)
+        #if UNITY_EDITOR
+        string[] guids = AssetDatabase.FindAssets("t:Texture2D " + System.IO.Path.GetFileName(path));
+        foreach (string guid in guids)
+        {
+            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            if (assetPath.ToLower().Contains(path.Replace("Models/", "").ToLower()))
+            {
+                return AssetDatabase.LoadAssetAtPath<Texture2D>(assetPath);
+            }
+        }
+        #endif
+        
+        return null;
     }
     
     private void InitializeHats()
@@ -69,16 +254,13 @@ public class HatController : MonoBehaviour
         // Загружаем текстуры и создаем материалы перед инициализацией персонажей
         LoadHelmetTextures();
         
-        // Инициализация шапок для Гены
-        if (genaHats.characterObject != null)
+        // Инициализация шапок для всех персонажей
+        foreach (var characterHats in characters)
         {
-            InitializeCharacterHats(genaHats, genaHats.characterObject.transform);
-        }
-        
-        // Инициализация шапок для Шапокляк
-        if (shopoklyakHats.characterObject != null)
-        {
-            InitializeCharacterHats(shopoklyakHats, shopoklyakHats.characterObject.transform);
+            if (characterHats != null && characterHats.characterObject != null)
+            {
+                InitializeCharacterHats(characterHats, characterHats.characterObject.transform);
+            }
         }
         
         // Создаем материалы после инициализации рендереров
@@ -91,25 +273,34 @@ public class HatController : MonoBehaviour
     private void InitializeCharacterHats(CharacterHats hats, Transform parent)
     {
         // Создаем кокошник
-        if (kokoshnikPrefab != null && hats.kokoshnikInstance == null)
+        if (hats.kokoshnikInstance == null)
         {
-            hats.kokoshnikInstance = Instantiate(kokoshnikPrefab, parent);
-            hats.kokoshnikInstance.SetActive(false);
+            GameObject prefab = GetModelPrefab(kokoshnikPrefab, kokoshnikModelPath);
+            if (prefab != null)
+            {
+                hats.kokoshnikInstance = Instantiate(prefab, parent);
+                hats.kokoshnikInstance.SetActive(false);
+            }
         }
         
         // Создаем бороду
-        if (borodaPrefab != null && hats.borodaInstance == null)
+        if (hats.borodaInstance == null)
         {
-            hats.borodaInstance = Instantiate(borodaPrefab, parent);
-            hats.borodaInstance.SetActive(false);
+            GameObject prefab = GetModelPrefab(borodaPrefab, borodaModelPath);
+            if (prefab != null)
+            {
+                hats.borodaInstance = Instantiate(prefab, parent);
+                hats.borodaInstance.SetActive(false);
+            }
         }
         
         // Создаем каску
-        if (helmetPrefab != null)
+        if (hats.helmetInstance == null)
         {
-            if (hats.helmetInstance == null)
+            GameObject prefab = GetModelPrefab(helmetPrefab, helmetModelPath);
+            if (prefab != null)
             {
-                hats.helmetInstance = Instantiate(helmetPrefab, parent);
+                hats.helmetInstance = Instantiate(prefab, parent);
                 hats.helmetInstance.SetActive(false);
                 
                 // Получаем рендерер каски
@@ -118,11 +309,34 @@ public class HatController : MonoBehaviour
         }
         
         // Создаем ящик
-        if (orangeBoxPrefab != null && hats.orangeBoxInstance == null)
+        if (hats.orangeBoxInstance == null)
         {
-            hats.orangeBoxInstance = Instantiate(orangeBoxPrefab, parent);
-            hats.orangeBoxInstance.SetActive(false);
+            GameObject prefab = GetModelPrefab(orangeBoxPrefab, orangeBoxModelPath);
+            if (prefab != null)
+            {
+                hats.orangeBoxInstance = Instantiate(prefab, parent);
+                hats.orangeBoxInstance.SetActive(false);
+            }
         }
+    }
+    
+    private GameObject GetModelPrefab(GameObject prefab, string resourcePath)
+    {
+        // Если префаб назначен напрямую, используем его
+        if (prefab != null)
+        {
+            return prefab;
+        }
+        
+        // Иначе пытаемся загрузить из Resources
+        GameObject loaded = Resources.Load<GameObject>(resourcePath);
+        if (loaded != null)
+        {
+            return loaded;
+        }
+        
+        Debug.LogWarning($"Не удалось загрузить модель по пути: {resourcePath}. Назначьте префаб в Inspector.");
+        return null;
     }
     
     private void LoadHelmetTextures()
@@ -154,7 +368,15 @@ public class HatController : MonoBehaviour
     private void CreateHelmetMaterials()
     {
         // Создаем материалы для разных цветов, если они не назначены
-        Renderer helmetRenderer = genaHats.helmetRenderer ?? shopoklyakHats.helmetRenderer;
+        Renderer helmetRenderer = null;
+        foreach (var characterHats in characters)
+        {
+            if (characterHats != null && characterHats.helmetRenderer != null)
+            {
+                helmetRenderer = characterHats.helmetRenderer;
+                break;
+            }
+        }
         
         if (helmetDefaultMaterial == null && helmetRenderer != null)
         {
@@ -209,15 +431,25 @@ public class HatController : MonoBehaviour
     {
         currentHatType = hatType;
         
-        // Скрываем все шапки
-        SetCharacterHatsActive(genaHats, false);
-        SetCharacterHatsActive(shopoklyakHats, false);
+        // Скрываем все шапки у всех персонажей
+        foreach (var characterHats in characters)
+        {
+            if (characterHats != null)
+            {
+                SetCharacterHatsActive(characterHats, false);
+            }
+        }
         
-        // Показываем выбранную шапку
+        // Показываем выбранную шапку у всех персонажей
         if (hatType != HatType.None)
         {
-            SetCharacterHatsActive(genaHats, hatType, true);
-            SetCharacterHatsActive(shopoklyakHats, hatType, true);
+            foreach (var characterHats in characters)
+            {
+                if (characterHats != null && characterHats.characterObject != null)
+                {
+                    SetCharacterHatsActive(characterHats, hatType, true);
+                }
+            }
         }
         
         // Уведомляем об изменении
@@ -230,11 +462,14 @@ public class HatController : MonoBehaviour
         
         if (currentHatType == HatType.None) return renderers;
         
-        // Получаем рендереры для Гены
-        AddCharacterHatRenderers(genaHats, renderers);
-        
-        // Получаем рендереры для Шапокляк
-        AddCharacterHatRenderers(shopoklyakHats, renderers);
+        // Получаем рендереры для всех персонажей
+        foreach (var characterHats in characters)
+        {
+            if (characterHats != null)
+            {
+                AddCharacterHatRenderers(characterHats, renderers);
+            }
+        }
         
         return renderers;
     }
@@ -276,8 +511,13 @@ public class HatController : MonoBehaviour
         
         if (currentHatType == HatType.Helmet)
         {
-            UpdateHelmetColors(genaHats, color);
-            UpdateHelmetColors(shopoklyakHats, color);
+            foreach (var characterHats in characters)
+            {
+                if (characterHats != null)
+                {
+                    UpdateHelmetColors(characterHats, color);
+                }
+            }
         }
     }
     

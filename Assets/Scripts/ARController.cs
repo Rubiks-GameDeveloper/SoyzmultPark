@@ -8,6 +8,7 @@ using WebARFoundation;
 public class ARController : MonoBehaviour
 {
     private static readonly int Amount = Shader.PropertyToID("_Amount");
+    [Header("Character Objects (deprecated - use HatController instead)")]
     [SerializeField] private GameObject genaObject;
     [SerializeField] private GameObject shopoklyakObject;
 
