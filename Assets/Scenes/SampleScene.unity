@@ -775,6 +775,62 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 40907251}
   m_CullTransparentMesh: 1
+--- !u!1 &44926028
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 44926030}
+  - component: {fileID: 44926029}
+  m_Layer: 0
+  m_Name: HatUIManage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &44926029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 44926028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80ad28376e4f77f4eab5ad9372ddb495, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hatController: {fileID: 0}
+  noneButton: {fileID: 0}
+  kokoshnikButton: {fileID: 0}
+  borodaButton: {fileID: 0}
+  helmetButton: {fileID: 0}
+  orangeBoxButton: {fileID: 0}
+  helmetColorPanel: {fileID: 0}
+  helmetDefaultButton: {fileID: 0}
+  helmetBlueButton: {fileID: 0}
+  helmetWhiteButton: {fileID: 0}
+  hatSelectionPanel: {fileID: 0}
+  toggleHatPanelButton: {fileID: 0}
+--- !u!4 &44926030
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 44926028}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.1182861, y: 0.2243042, z: 0.06566917}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &72794899
 GameObject:
   m_ObjectHideFlags: 0
@@ -811,7 +867,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -81.599, y: 107}
+  m_AnchoredPosition: {x: -81.59912, y: 107}
   m_SizeDelta: {x: -220.97852, y: 125.41333}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &72794901
@@ -1337,6 +1393,7 @@ GameObject:
   - component: {fileID: 252006243}
   - component: {fileID: 252006245}
   - component: {fileID: 252006246}
+  - component: {fileID: 252006247}
   m_Layer: 0
   m_Name: Image AR Session
   m_TagString: Untagged
@@ -1428,7 +1485,58 @@ MonoBehaviour:
   - {fileID: 1964602099}
   - {fileID: 482857706}
   - {fileID: 1053230161}
+  - {fileID: -7511558181221131132, guid: 6f8a0713ddf8f1449a4425b69cd344dc, type: 3}
   _snowfallParticleSystem: {fileID: 1388681824}
+  hatController: {fileID: 252006247}
+--- !u!114 &252006247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 252006242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2685f3f16c2a41e4f9e55f2c9c235804, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  autoFindCharacters: 1
+  characters:
+  - characterObject: {fileID: 0}
+    kokoshnikInstance: {fileID: 0}
+    borodaInstance: {fileID: 0}
+    helmetDefaultInstance: {fileID: 0}
+    helmetBlueInstance: {fileID: 0}
+    helmetWhiteInstance: {fileID: 0}
+    orangeBoxInstance: {fileID: 0}
+  - characterObject: {fileID: 0}
+    kokoshnikInstance: {fileID: 0}
+    borodaInstance: {fileID: 0}
+    helmetDefaultInstance: {fileID: 0}
+    helmetBlueInstance: {fileID: 0}
+    helmetWhiteInstance: {fileID: 0}
+    orangeBoxInstance: {fileID: 0}
+  - characterObject: {fileID: 0}
+    kokoshnikInstance: {fileID: 0}
+    borodaInstance: {fileID: 0}
+    helmetDefaultInstance: {fileID: 0}
+    helmetBlueInstance: {fileID: 0}
+    helmetWhiteInstance: {fileID: 0}
+    orangeBoxInstance: {fileID: 0}
+  kokoshnikPrefab: {fileID: 482857705}
+  borodaPrefab: {fileID: 1455472295}
+  helmetPrefab: {fileID: 1904485671}
+  orangeBoxPrefab: {fileID: 1462713317}
+  kokoshnikModelPath: Models/kokoshnik/kokoshnik
+  borodaModelPath: Models/boroda/boroda
+  helmetModelPath: Models/helmet/hamlet
+  orangeBoxModelPath: Models/orange_box/SecretofOrange
+  helmetDefaultMaterial: {fileID: 0}
+  helmetBlueMaterial: {fileID: 0}
+  helmetWhiteMaterial: {fileID: 0}
+  helmetDefaultTexture: {fileID: 0}
+  helmetBlueTexture: {fileID: 0}
+  helmetWhiteTexture: {fileID: 0}
 --- !u!1 &261437977
 GameObject:
   m_ObjectHideFlags: 0
@@ -1586,7 +1694,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 17.652222, y: -41.66919}
+  m_AnchoredPosition: {x: 17.6521, y: -41.66919}
   m_SizeDelta: {x: -35.3049, y: -165.6519}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &280171241
@@ -2024,6 +2132,63 @@ MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: e8a8a763373258c46be174ab9d311aab, type: 3}
   m_PrefabInstance: {fileID: 482857703}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &486069789
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1246794332}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 6f8a0713ddf8f1449a4425b69cd344dc, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6f8a0713ddf8f1449a4425b69cd344dc, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -5.551116e-17
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6f8a0713ddf8f1449a4425b69cd344dc, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.1102237e-16
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6f8a0713ddf8f1449a4425b69cd344dc, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071067
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6f8a0713ddf8f1449a4425b69cd344dc, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.7071069
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6f8a0713ddf8f1449a4425b69cd344dc, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6f8a0713ddf8f1449a4425b69cd344dc, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6f8a0713ddf8f1449a4425b69cd344dc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6f8a0713ddf8f1449a4425b69cd344dc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 6f8a0713ddf8f1449a4425b69cd344dc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 6f8a0713ddf8f1449a4425b69cd344dc, type: 3}
+      propertyPath: m_Name
+      value: hamlet
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6f8a0713ddf8f1449a4425b69cd344dc, type: 3}
 --- !u!1 &550854313
 GameObject:
   m_ObjectHideFlags: 0
@@ -3067,6 +3232,7 @@ Transform:
   - {fileID: 1455472294}
   - {fileID: 482857704}
   - {fileID: 1053230160}
+  - {fileID: 1904485672}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1248329104
@@ -8323,7 +8489,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -98.17224, y: 106.65991}
+  m_AnchoredPosition: {x: -98.17236, y: 106.65991}
   m_SizeDelta: {x: 139.70502, y: 126.06}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1411073835
@@ -8907,6 +9073,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 2
   m_VerticalFit: 1
+--- !u!1 &1462713317 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 691ced456a7d8de4cb2960fe6a7904bb, type: 3}
+  m_PrefabInstance: {fileID: 1053230159}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1678310373
 GameObject:
   m_ObjectHideFlags: 0
@@ -8980,7 +9151,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -82.16345, y: 106.5249}
+  m_AnchoredPosition: {x: -82.163574, y: 106.5249}
   m_SizeDelta: {x: -220.77832, y: 126.70868}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1696147992
@@ -9262,6 +9433,16 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1870158577}
   m_CullTransparentMesh: 1
+--- !u!1 &1904485671 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 6f8a0713ddf8f1449a4425b69cd344dc, type: 3}
+  m_PrefabInstance: {fileID: 486069789}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1904485672 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6f8a0713ddf8f1449a4425b69cd344dc, type: 3}
+  m_PrefabInstance: {fileID: 486069789}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1905186406
 GameObject:
   m_ObjectHideFlags: 0
@@ -10175,3 +10356,4 @@ SceneRoots:
   - {fileID: 1246794332}
   - {fileID: 1241719913}
   - {fileID: 2132411041}
+  - {fileID: 44926030}
