@@ -23,6 +23,10 @@ public class HatUIManager : MonoBehaviour
     [SerializeField] private GameObject hatSelectionPanel;
     [SerializeField] private Button toggleHatPanelButton;
     
+    [Header("Start Button (optional - will auto-find)")]
+    [Tooltip("Кнопка, при нажатии на которую показывается панель выбора шапок. Если не назначена, будет найдена автоматически.")]
+    [SerializeField] private Button startButton;
+    
     private void Start()
     {
         InitializeButtons();
@@ -33,10 +37,38 @@ public class HatUIManager : MonoBehaviour
             helmetColorPanel.SetActive(false);
         }
         
-        // Скрываем панель выбора шапок по умолчанию (можно настроить)
+        // Скрываем панель выбора шапок по умолчанию (будет показана после нажатия кнопки Start)
         if (hatSelectionPanel != null)
         {
-            hatSelectionPanel.SetActive(true);
+            hatSelectionPanel.SetActive(false);
+        }
+        
+        // Автоматически находим и подключаем кнопку Start
+        ConnectToStartButton();
+    }
+    
+    private void ConnectToStartButton()
+    {
+        // Если кнопка не назначена в Inspector, пытаемся найти её автоматически
+        if (startButton == null)
+        {
+            // Ищем кнопку StartButton в сцене
+            GameObject startButtonObj = GameObject.Find("StartButton");
+            if (startButtonObj != null)
+            {
+                startButton = startButtonObj.GetComponent<Button>();
+            }
+        }
+        
+        // Подключаем показ панели к кнопке Start
+        if (startButton != null)
+        {
+            startButton.onClick.AddListener(ShowHatPanel);
+            Debug.Log("Панель выбора шапок подключена к кнопке Start");
+        }
+        else
+        {
+            Debug.LogWarning("Кнопка StartButton не найдена. Назначьте её в Inspector или убедитесь, что кнопка называется 'StartButton'");
         }
     }
     
